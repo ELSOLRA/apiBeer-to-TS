@@ -35,6 +35,7 @@ class BeerApp {
     private randomBeerButton: HTMLElement = document.getElementById('random-beer-btn') as HTMLElement;
     private beerImage: HTMLImageElement = document.getElementById('image') as HTMLImageElement;
     private infoBtn: HTMLElement = document.getElementById('info-btn') as HTMLElement;
+    private beerName: HTMLElement = document.getElementById('beer-name') as HTMLElement;
 
     constructor() {
         this.setupEventListeners();
@@ -143,9 +144,9 @@ class BeerApp {
               beerItem.textContent = beer.name;
               beerItem.addEventListener('click', () =>  {
                 this.descriptionBox.textContent= "";
-                clearSelectedLi();
-                markSelectedLi(beerItem);
-                displayBeerDetails(beer);
+                this.clearSelectedLi();
+                this.markSelectedLi(beerItem);
+                this.displayBeerDetails(beer);
               });
               beerList.appendChild(beerItem);
           
@@ -174,8 +175,65 @@ class BeerApp {
             }
         }
 
-        
+        private displayBeerDetails(beer: Beer) {
+            this.imgBox.textContent = '';
+            if (beer.image_url !== null && beer.image_url !== '') {
+              this.beerImage.src = beer.image_url;
+              this.imgBox.appendChild(this.beerImage);
+            } else {
+              this.displayNoImage();
+            }
+            this.beerName.textContent = beer.name;
+            console.log(beer);
+        }
 
+        private clearSelectedLi() {
+            const liElements = document.querySelectorAll('.beer-list li');
+            liElements.forEach((li) => {
+              li.classList.remove('selected');
+            });
+          }
+        
+          private markSelectedLi(beerItem: HTMLLIElement) {
+            beerItem.classList.add('selected');
+          }
+        
+          private async showAdditionalInfo() {
+            const selectedBeerName = this.beerName.textContent;
+            this.descriptionBox.textContent = "";
+        
+            try {
+                const response = await fetch(`${this.searUrlApi}?beer_name=${selectedBeerName}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP Error!: ${response.status}`);
+                }
+                const beers = await response.json() as Beer[];
+                console.log(beers);
+                if (beers.length > 0) {
+                    const selectedBeer = beers[0];
+        
+                    // Display volume information in descriptionBox
+                    const displayHops = selectedBeer.ingredients.hops.map(hop => hop.name).join(', ');
+                    const displayMalt = selectedBeer.ingredients.malt.map(malt => malt.name).join(', ');
+        
+                    const volumeInfo = `
+                        <p>Description: ${selectedBeer.description}</p>
+                        <p>Volume: ${selectedBeer.volume.value} ${selectedBeer.volume.unit}</p>
+                        <p>ABV: ${selectedBeer.abv}%</p>
+                        <p>Malt: ${displayMalt}</p>
+                        <p>Hops: ${displayHops}</p>
+                        <p>Food paring: ${selectedBeer.food_pairing}</p>
+                        <p>Brew Tips: ${selectedBeer.brewers_tips}</p>
+                    `;
+                    this.descriptionBox.innerHTML = volumeInfo;
+                    console.log("Additional Info for", selectedBeerName, ":", selectedBeer);
+                }
+            } catch (error) {
+                console.log("Error fetching additional info:", error);
+            }
+        }
+        
+        
 
 }
         
