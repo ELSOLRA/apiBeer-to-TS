@@ -1,0 +1,246 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100vw;
+  background-image: url(https://img.freepik.com/free-vector/gradient-background-international-beer-day-celebration_23-2150533676.jpg?w=1380&t=st=1700686248~exp=1700686848~hmac=e4a064d283a018fbe84f21c80ad5fb53132c33d156dfa13add59cd4e86513b12);
+  background-repeat: no-repeat;
+  background-size: cover;
+  gap: 10%;
+}
+
+.searchings-container {
+  margin: 15% 0 0 auto;
+}
+
+#searched-content {
+  padding-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  background-color: rgba(213, 173, 53, 0.364);
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.242);
+  border-bottom: none;
+  border-width: 0.1rem;
+  width: 25rem;
+  height: 20rem;
+}
+
+h1 {
+    margin-bottom: 0.5rem;
+}
+
+ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 100%;
+  flex-direction: column;
+}
+
+li {
+  cursor: pointer;
+  margin: 0 auto;
+  margin-bottom: 0.3rem;
+}
+
+p {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.container__navigation {
+  display: flex;
+  justify-content: center;
+  background-color: rgba(213, 173, 53, 0.364);
+  margin-bottom: 1rem;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.242);
+  border-top: none;
+  border-width: 0.1rem;
+}
+
+#current-page {
+  display: grid;
+  align-items: center;
+}
+
+#result-box {
+  width: 40vw;
+  margin: 0 auto 0 0;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: center;
+}
+
+#search-box {
+  display: table;
+  height: 6rem;
+  width: 25rem;
+  background-color: rgba(213, 173, 53, 0.364);
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.242);
+  border-width: 0.1rem;
+}
+
+
+
+#img-box {
+  width: auto;
+  height: 40vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+img {
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+}
+
+#beer-info {
+  padding: 1rem;
+  padding-bottom: 4rem;
+  margin-top: 1rem;
+  height: auto;
+  background-color: rgba(213, 173, 53, 0.518);
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.242);
+  border-width: 0.1rem;
+  position: relative;
+  width: 100%;
+  
+}
+
+#info-btn {
+  position: absolute;
+  bottom: 0%;
+  /* width: 25%; */
+  margin: 0.5rem;
+}
+
+#search-btn {
+  width: 7rem;
+  margin-left: 35%;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+#random-beer-btn {
+  margin-top: 1rem;
+}
+
+#next-page {
+  margin-left: 0.5rem;
+  width: 5%;
+  display: flex;
+  justify-content: center;
+}
+
+#prev-page {
+  margin-right: 0.5rem;
+  width: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+button {
+  background-color: #f4d003;
+  border-radius: 12px;
+  color: #000;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 10px 15px;
+  text-align: center;
+  transition: 200ms;
+  box-sizing: border-box;
+  border: 0;
+  font-size: 16px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+button:not(:disabled):hover,
+button:not(:disabled):focus {
+  outline: 0;
+  background: #f2cf07;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2), 0 3px 8px 0 rgba(0, 0, 0, 0.15);
+}
+
+button:disabled {
+  filter: saturate(0.2) opacity(0.5);
+  -webkit-filter: saturate(0.2) opacity(0.5);
+  cursor: not-allowed;
+}
+
+label {
+  margin-left: 39%;
+  font-weight: bold;
+}
+
+input {
+  font-family: "Roboto", sans-serif;
+  color: #333;
+  font-size: 1.2rem;
+  margin: 0 auto;
+  padding: 1rem 1rem;
+  border-radius: 0.2rem;
+  background-color: rgb(255, 255, 255);
+  border: none;
+  width: 15rem;
+  display: block;
+  border-bottom: 0.3rem solid transparent;
+  transition: all 0.3s;
+}
+
+.selected {
+  font-weight: bold;
+  background-color:#f2cf07 ;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+}
+
+.selected::after {
+  content: " ▸";
+  margin-left: 0.1rem;
+
+}
+
+.one-beer {
+  display: flex;
+  font-size: x-large;
+  cursor: pointer;
+  justify-content: center;
+  align-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 18%;
+}
+
+.showPil::after {
+  content: " ▸";
+  margin-left: 0.5rem;
+}
+

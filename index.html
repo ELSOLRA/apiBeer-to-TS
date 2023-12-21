@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="wrapper">
+      <div class="searchings-container" id="searched-container">
+        <div id="searched-content"></div>
+        <div class="container__navigation" id="searched-navigation">
+          <button class="container__prev-page" id="prev-page">◁</button>
+          <span class="container__current-page" id="current-page"> </span>
+          <button class="container__next-page" id="next-page">▷</button>
+        </div>
+
+        <div id="search-box">
+          <label for="site-search">Search Beer:</label>
+          <input type="search" id="site-search" placeholder="search" />
+          <button id="search-btn">Search</button>
+      </div>
+      <button id="random-beer-btn">Random Beer</button>
+      </div>
+      
+
+      <div id="result-box">
+        <div id="img-box">
+          <img id="image" src="https://images.punkapi.com/v2/36.png" alt="beer">
+        </div>
+        <div id="beer-info">
+        <h1 id="beer-name">Beer</h1>
+        <div id="description-box"></div>
+        <button id="info-btn">See more</button>
+        </div>
+      </div>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>
