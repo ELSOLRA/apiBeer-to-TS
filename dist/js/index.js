@@ -32,32 +32,47 @@ class BeerApp {
         this.setupEventListeners();
     }
     setupEventListeners() {
-        this.searchButton.addEventListener('click', () => this.searchBeer());
-        this.randomBeerButton.addEventListener('click', () => this.getRandomBeer());
+        this.searchButton.addEventListener('click', () => {
+            console.log('Search button clicked');
+            this.searchBeer();
+        });
+        this.randomBeerButton.addEventListener('click', () => {
+            console.log('RandomBeer button clicked');
+            this.getRandomBeer();
+        });
         this.nextPageButton.addEventListener("click", () => this.nextPage());
         this.prevPageButton.addEventListener("click", () => this.prevPage());
         this.infoBtn.addEventListener('click', () => __awaiter(this, void 0, void 0, function* () { return this.showAdditionalInfo(); }));
     }
     getRandomBeer() {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('Before fetch');
+            this.descriptionBox.textContent = "";
             this.searchedContent.textContent = '';
             try {
                 const response = yield fetch(`${this.searUrlApi}/random`);
+                console.log('After fetch');
                 if (!response.ok) {
                     throw new Error(`HTTP Error!: ${response.status}`);
                 }
                 const beer = yield response.json();
+                console.log(beer);
                 this.displayBeer(beer);
             }
             catch (error) {
                 console.log("Error fetching message :", error);
+                this.displayNoResults();
             }
         });
     }
     searchBeer() {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('searchBeer method called');
             this.searchedContent.textContent = '';
             const searchWord = this.input.value.trim();
+            if (searchWord === '') {
+                return;
+            }
             let pageForTotal = 1;
             let moreResults = true;
             let totalResultBeers = [];
@@ -66,6 +81,7 @@ class BeerApp {
             }
             try {
                 const response = yield fetch(`${this.searUrlApi}?beer_name=${searchWord}&page=${this.currentPage}&per_page=${this.beersPerPage}`);
+                console.log(`${this.searUrlApi}?beer_name=${searchWord}&page=${this.currentPage}&per_page=${this.beersPerPage}`);
                 if (!response.ok) {
                     throw new Error(`HTTP Error!: ${response.status}`);
                 }
@@ -92,6 +108,7 @@ class BeerApp {
                     this.displayBeerList();
                     this.updatePageDisplay();
                 }
+                this.lastSearchWord = searchWord;
             }
             catch (error) {
                 console.log("Error fetching message :", error);
@@ -109,16 +126,19 @@ class BeerApp {
         this.imgBox.appendChild(noImagePlaceholder);
     }
     displayBeer(beer) {
+        console.log('Displaying beer:', beer);
         this.searchedContent.textContent = "";
         const beerElement = document.createElement('p');
         beerElement.classList.add('one-beer');
-        beerElement.textContent = beer.name;
+        beerElement.textContent = beer[0].name;
+        ;
         beerElement.addEventListener('click', () => {
             var _a;
-            this.displayBeerDetails(beer);
+            console.log('Beer element clicked:', beer[0].name);
             beerElement.style.backgroundColor = "yellow";
             (_a = document.querySelector(".one-beer")) === null || _a === void 0 ? void 0 : _a.classList.add("showPil");
             this.descriptionBox.textContent = "";
+            this.displayBeerDetails(beer[0]);
         });
         this.searchedContent.appendChild(beerElement);
     }
@@ -164,14 +184,18 @@ class BeerApp {
         });
     }
     displayBeerDetails(beer) {
+        console.log('Displaying beer details:', beer);
         this.imgBox.textContent = '';
         if (beer.image_url !== null && beer.image_url !== '') {
+            console.log('Updating image:', beer.image_url);
             this.beerImage.src = beer.image_url;
             this.imgBox.appendChild(this.beerImage);
         }
         else {
+            console.log('Displaying no image');
             this.displayNoImage();
         }
+        console.log('Updating beer name:', beer.name);
         this.beerName.textContent = beer.name;
         console.log(beer);
     }
@@ -218,3 +242,4 @@ class BeerApp {
         });
     }
 }
+const beerApp = new BeerApp();

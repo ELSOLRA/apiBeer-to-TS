@@ -53,10 +53,6 @@ async function getRandomBeer() {
 //----------- Search function
 
 async function searchBeer (searchWord) {
-  /* if (searchWord.trim() === "") {
-    console.log("Sökordet är tomt");
-    displayNoResults();
-    return; */
   searchedContent.textContent = "";
   lastSearchWord = searchWord;
   let pageForTotal = 1;

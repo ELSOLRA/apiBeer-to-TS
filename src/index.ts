@@ -19,53 +19,68 @@ class BeerApp {
 
     private searUrlApi = 'https://api.punkapi.com/v2/beers';
     private input: HTMLInputElement = document.getElementById('site-search') as HTMLInputElement;
-    private searchedContent: HTMLElement = document.getElementById('searched-content') as HTMLElement;
-    private imgBox: HTMLElement = document.getElementById('img-box') as HTMLElement;
-    private descriptionBox: HTMLElement = document.getElementById('description-box') as HTMLElement;
+    private searchedContent: HTMLDivElement = document.getElementById('searched-content') as HTMLDivElement;
+    private imgBox: HTMLDivElement = document.getElementById('img-box') as HTMLDivElement;
+    private descriptionBox: HTMLDivElement = document.getElementById('description-box') as HTMLDivElement;
     private currentPage: number = 1;
     private beersPerPage: number = 10;
     private displayedBeers: Beer[] = [];
     private totalBeers: number = 0;
     private totalPages: number = 0;
     private lastSearchWord: string = '';
-    private currentPageSpan: HTMLElement = document.getElementById('current-page') as HTMLElement;
-    private searchButton: HTMLElement = document.getElementById('search-btn') as HTMLElement;
-    private nextPageButton: HTMLElement = document.getElementById('next-page') as HTMLElement;
-    private prevPageButton: HTMLElement = document.getElementById('prev-page') as HTMLElement;
-    private randomBeerButton: HTMLElement = document.getElementById('random-beer-btn') as HTMLElement;
+    private currentPageSpan: HTMLSpanElement = document.getElementById('current-page') as HTMLSpanElement;
+    private searchButton: HTMLButtonElement = document.getElementById('search-btn') as HTMLButtonElement;
+    private nextPageButton: HTMLButtonElement = document.getElementById('next-page') as HTMLButtonElement;
+    private prevPageButton: HTMLButtonElement = document.getElementById('prev-page') as HTMLButtonElement;
+    private randomBeerButton: HTMLButtonElement = document.getElementById('random-beer-btn') as HTMLButtonElement;
     private beerImage: HTMLImageElement = document.getElementById('image') as HTMLImageElement;
-    private infoBtn: HTMLElement = document.getElementById('info-btn') as HTMLElement;
-    private beerName: HTMLElement = document.getElementById('beer-name') as HTMLElement;
+    private infoBtn: HTMLButtonElement = document.getElementById('info-btn') as HTMLButtonElement;
+    private beerName: HTMLParagraphElement = document.getElementById('beer-name') as HTMLParagraphElement;
 
     constructor() {
         this.setupEventListeners();
     }
 
     private setupEventListeners() {
-        this.searchButton.addEventListener('click', () => this.searchBeer());
-        this.randomBeerButton.addEventListener('click', () => this.getRandomBeer());
+        this.searchButton.addEventListener('click', () => {
+            console.log('Search button clicked');
+            this.searchBeer();
+        });
+        this.randomBeerButton.addEventListener('click', () => {
+            console.log('RandomBeer button clicked'); 
+            this.getRandomBeer()});
         this.nextPageButton.addEventListener("click", () => this.nextPage());
         this.prevPageButton.addEventListener("click", () => this.prevPage());
         this.infoBtn.addEventListener('click', async () => this.showAdditionalInfo());
     }
 
     private async getRandomBeer() {
+        console.log('Before fetch');
+        this.descriptionBox.textContent = "";
         this.searchedContent.textContent = '';
         try {
           const response = await fetch(`${this.searUrlApi}/random`);
+          console.log('After fetch');
           if (!response.ok) {
             throw new Error(`HTTP Error!: ${response.status}`);
           }
-          const beer = await response.json() as Beer;
+          const beer = await response.json() as Beer[];
+          console.log(beer);
           this.displayBeer(beer);
+   
         } catch (error) {
             console.log("Error fetching message :", error);
+            this.displayNoResults();
           }
     }
 
     private async searchBeer() {
+        console.log('searchBeer method called');
         this.searchedContent.textContent = '';
         const searchWord = this.input.value.trim();
+        if (searchWord === '') {
+            return;
+        }
         let pageForTotal = 1; // Start from the next page
         let moreResults = true;
         let totalResultBeers: Beer[] = [];
@@ -74,6 +89,7 @@ class BeerApp {
         }
         try {
             const response = await fetch(`${this.searUrlApi}?beer_name=${searchWord}&page=${this.currentPage}&per_page=${this.beersPerPage}`);
+            console.log(`${this.searUrlApi}?beer_name=${searchWord}&page=${this.currentPage}&per_page=${this.beersPerPage}`);
             if (!response.ok) {
               throw new Error(`HTTP Error!: ${response.status}`);
             }
@@ -102,8 +118,11 @@ class BeerApp {
                 this.displayBeerList();
                 this.updatePageDisplay();
               }
+            
+            this.lastSearchWord = searchWord;
             } catch (error) {
               console.log("Error fetching message :", error);
+              
             }
         }
         
@@ -119,16 +138,18 @@ class BeerApp {
             this.imgBox.appendChild(noImagePlaceholder);
         }    
 
-        private displayBeer(beer: Beer) { 
+        private displayBeer(beer: Beer[]) { 
+            console.log('Displaying beer:', beer);
             this.searchedContent.textContent = "";
             const beerElement = document.createElement('p'); 
             beerElement.classList.add('one-beer');
-            beerElement.textContent = beer.name;  
+            beerElement.textContent = beer[0].name;;  
             beerElement.addEventListener('click', () => {
-                this.displayBeerDetails(beer);
+                console.log('Beer element clicked:', beer[0].name);
                 beerElement.style.backgroundColor = "yellow";
                 document.querySelector(".one-beer")?.classList.add("showPil");
                 this.descriptionBox.textContent = "";
+                this.displayBeerDetails(beer[0]);
             });
             this.searchedContent.appendChild(beerElement);
         }
@@ -176,13 +197,18 @@ class BeerApp {
         }
 
         private displayBeerDetails(beer: Beer) {
+
+            console.log('Displaying beer details:', beer);
             this.imgBox.textContent = '';
             if (beer.image_url !== null && beer.image_url !== '') {
+              console.log('Updating image:', beer.image_url);
               this.beerImage.src = beer.image_url;
               this.imgBox.appendChild(this.beerImage);
             } else {
+              console.log('Displaying no image');
               this.displayNoImage();
             }
+            console.log('Updating beer name:', beer.name);
             this.beerName.textContent = beer.name;
             console.log(beer);
         }
@@ -232,9 +258,8 @@ class BeerApp {
                 console.log("Error fetching additional info:", error);
             }
         }
-        
-        
-
 }
+
+const beerApp = new BeerApp();
         
         
