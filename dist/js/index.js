@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,7 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-class BeerApp {
+import * as EventService from './eventService.js';
+import * as Apis from './api.js';
+export class BeerApp {
     constructor() {
         this.searUrlApi = 'https://api.punkapi.com/v2/beers';
         this.input = document.getElementById('site-search');
@@ -32,17 +33,7 @@ class BeerApp {
         this.setupEventListeners();
     }
     setupEventListeners() {
-        this.searchButton.addEventListener('click', () => {
-            console.log('Search button clicked');
-            this.searchBeer();
-        });
-        this.randomBeerButton.addEventListener('click', () => {
-            console.log('RandomBeer button clicked');
-            this.getRandomBeer();
-        });
-        this.nextPageButton.addEventListener("click", () => this.nextPage());
-        this.prevPageButton.addEventListener("click", () => this.prevPage());
-        this.infoBtn.addEventListener('click', () => __awaiter(this, void 0, void 0, function* () { return this.showAdditionalInfo(); }));
+        EventService.setupEventListeners(this.searchButton, this.randomBeerButton, this.nextPageButton, this.prevPageButton, this.infoBtn, this);
     }
     getRandomBeer() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -50,12 +41,7 @@ class BeerApp {
             this.descriptionBox.textContent = "";
             this.searchedContent.textContent = '';
             try {
-                const response = yield fetch(`${this.searUrlApi}/random`);
-                console.log('After fetch');
-                if (!response.ok) {
-                    throw new Error(`HTTP Error!: ${response.status}`);
-                }
-                const beer = yield response.json();
+                const beer = yield Apis.getRandomBeer(this.searUrlApi);
                 console.log(beer);
                 this.displayBeer(beer);
             }
@@ -80,12 +66,7 @@ class BeerApp {
                 return;
             }
             try {
-                const response = yield fetch(`${this.searUrlApi}?beer_name=${searchWord}&page=${this.currentPage}&per_page=${this.beersPerPage}`);
-                console.log(`${this.searUrlApi}?beer_name=${searchWord}&page=${this.currentPage}&per_page=${this.beersPerPage}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP Error!: ${response.status}`);
-                }
-                const result = yield response.json();
+                const result = yield Apis.searchBeers(this.searUrlApi, searchWord, this.currentPage, this.beersPerPage);
                 console.log(result);
                 this.displayedBeers = result;
                 while (moreResults) {
@@ -213,17 +194,10 @@ class BeerApp {
             const selectedBeerName = this.beerName.textContent;
             this.descriptionBox.textContent = "";
             try {
-                const response = yield fetch(`${this.searUrlApi}?beer_name=${selectedBeerName}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP Error!: ${response.status}`);
-                }
-                const beers = yield response.json();
-                console.log(beers);
-                if (beers.length > 0) {
-                    const selectedBeer = beers[0];
-                    const displayHops = selectedBeer.ingredients.hops.map(hop => hop.name).join(', ');
-                    const displayMalt = selectedBeer.ingredients.malt.map(malt => malt.name).join(', ');
-                    const volumeInfo = `
+                const selectedBeer = yield Apis.getBeerDetails(this.searUrlApi, selectedBeerName);
+                const displayHops = selectedBeer.ingredients.hops.map((hop) => hop.name).join(', ');
+                const displayMalt = selectedBeer.ingredients.malt.map((malt) => malt.name).join(', ');
+                const volumeInfo = `
                         <p>Description: ${selectedBeer.description}</p>
                         <p>Volume: ${selectedBeer.volume.value} ${selectedBeer.volume.unit}</p>
                         <p>ABV: ${selectedBeer.abv}%</p>
@@ -232,9 +206,8 @@ class BeerApp {
                         <p>Food paring: ${selectedBeer.food_pairing}</p>
                         <p>Brew Tips: ${selectedBeer.brewers_tips}</p>
                     `;
-                    this.descriptionBox.innerHTML = volumeInfo;
-                    console.log("Additional Info for", selectedBeerName, ":", selectedBeer);
-                }
+                this.descriptionBox.innerHTML = volumeInfo;
+                console.log("Additional Info for", selectedBeerName, ":", selectedBeer);
             }
             catch (error) {
                 console.log("Error fetching additional info:", error);

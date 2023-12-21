@@ -1,21 +1,8 @@
-interface Beer {
-    name: string;
-    description: string;
-    image_url: string | null;
-    volume: {
-        value: number;
-        unit: string;
-    };
-    abv: number;
-    ingredients: {
-        hops: { name: string }[];
-        malt: { name: string }[];
-    };
-    food_pairing: string [];
-    brewers_tips: string;
-}
+import Beer from "./interfaces.js";
+import * as EventService from './eventService.js';
+import * as Apis from './api.js';
 
-class BeerApp {
+export class BeerApp {
 
     private searUrlApi = 'https://api.punkapi.com/v2/beers';
     private input: HTMLInputElement = document.getElementById('site-search') as HTMLInputElement;
@@ -42,39 +29,31 @@ class BeerApp {
     }
 
     private setupEventListeners() {
-        this.searchButton.addEventListener('click', () => {
-            console.log('Search button clicked');
-            this.searchBeer();
-        });
-        this.randomBeerButton.addEventListener('click', () => {
-            console.log('RandomBeer button clicked'); 
-            this.getRandomBeer()});
-        this.nextPageButton.addEventListener("click", () => this.nextPage());
-        this.prevPageButton.addEventListener("click", () => this.prevPage());
-        this.infoBtn.addEventListener('click', async () => this.showAdditionalInfo());
+        EventService.setupEventListeners(
+            this.searchButton,
+            this.randomBeerButton,
+            this.nextPageButton,
+            this.prevPageButton,
+            this.infoBtn,
+            this
+        );
     }
-
-    private async getRandomBeer() {
+    public async getRandomBeer() {
         console.log('Before fetch');
         this.descriptionBox.textContent = "";
         this.searchedContent.textContent = '';
         try {
-          const response = await fetch(`${this.searUrlApi}/random`);
-          console.log('After fetch');
-          if (!response.ok) {
-            throw new Error(`HTTP Error!: ${response.status}`);
-          }
-          const beer = await response.json() as Beer[];
-          console.log(beer);
-          this.displayBeer(beer);
-   
+            // Use getRandomBeer function from api.ts
+            const beer = await Apis.getRandomBeer(this.searUrlApi);
+            console.log(beer);
+            this.displayBeer(beer);
         } catch (error) {
             console.log("Error fetching message :", error);
             this.displayNoResults();
-          }
+        }
     }
 
-    private async searchBeer() {
+    public async searchBeer() {
         console.log('searchBeer method called');
         this.searchedContent.textContent = '';
         const searchWord = this.input.value.trim();
@@ -88,12 +67,7 @@ class BeerApp {
           return;
         }
         try {
-            const response = await fetch(`${this.searUrlApi}?beer_name=${searchWord}&page=${this.currentPage}&per_page=${this.beersPerPage}`);
-            console.log(`${this.searUrlApi}?beer_name=${searchWord}&page=${this.currentPage}&per_page=${this.beersPerPage}`);
-            if (!response.ok) {
-              throw new Error(`HTTP Error!: ${response.status}`);
-            }
-            const result = await response.json() as Beer[];
+            const result = await Apis.searchBeers(this.searUrlApi, searchWord, this.currentPage, this.beersPerPage);
             console.log(result);
             this.displayedBeers = result; 
             
@@ -180,7 +154,7 @@ class BeerApp {
             this.currentPageSpan.textContent = `${this.currentPage} / ${this.totalPages}`;
         };
 
-        private async nextPage() {
+        public async nextPage() {
             if (this.currentPage < this.totalPages) {
                 this.currentPage++;
                 await this.searchBeer();
@@ -188,7 +162,7 @@ class BeerApp {
             }
         }
     
-        private async prevPage() {
+        public async prevPage() {
             if (this.currentPage > 1) {
                 this.currentPage--;
                 await this.searchBeer();
@@ -224,23 +198,17 @@ class BeerApp {
             beerItem.classList.add('selected');
           }
         
-          private async showAdditionalInfo() {
-            const selectedBeerName = this.beerName.textContent;
+          public async showAdditionalInfo() {
+            const selectedBeerName = this.beerName.textContent as string;
             this.descriptionBox.textContent = "";
         
             try {
-                const response = await fetch(`${this.searUrlApi}?beer_name=${selectedBeerName}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP Error!: ${response.status}`);
-                }
-                const beers = await response.json() as Beer[];
-                console.log(beers);
-                if (beers.length > 0) {
-                    const selectedBeer = beers[0];
+                const selectedBeer = await Apis.getBeerDetails(this.searUrlApi, selectedBeerName);       
+
         
-                    // Display volume information in descriptionBox
-                    const displayHops = selectedBeer.ingredients.hops.map(hop => hop.name).join(', ');
-                    const displayMalt = selectedBeer.ingredients.malt.map(malt => malt.name).join(', ');
+
+                    const displayHops = selectedBeer.ingredients.hops.map((hop: { name: string }) => hop.name).join(', ');
+                    const displayMalt = selectedBeer.ingredients.malt.map((malt: { name: string }) => malt.name).join(', ');
         
                     const volumeInfo = `
                         <p>Description: ${selectedBeer.description}</p>
@@ -253,12 +221,11 @@ class BeerApp {
                     `;
                     this.descriptionBox.innerHTML = volumeInfo;
                     console.log("Additional Info for", selectedBeerName, ":", selectedBeer);
-                }
-            } catch (error) {
+                } catch (error) {
                 console.log("Error fetching additional info:", error);
             }
         }
-}
+    }
 
 const beerApp = new BeerApp();
         
