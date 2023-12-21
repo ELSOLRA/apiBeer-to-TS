@@ -201,12 +201,8 @@ export class BeerApp {
           public async showAdditionalInfo() {
             const selectedBeerName = this.beerName.textContent as string;
             this.descriptionBox.textContent = "";
-        
             try {
                 const selectedBeer = await Apis.getBeerDetails(this.searUrlApi, selectedBeerName);       
-
-        
-
                     const displayHops = selectedBeer.ingredients.hops.map((hop: { name: string }) => hop.name).join(', ');
                     const displayMalt = selectedBeer.ingredients.malt.map((malt: { name: string }) => malt.name).join(', ');
         
@@ -226,7 +222,7 @@ export class BeerApp {
             }
         }
     }
-
+    
 const beerApp = new BeerApp();
         
         
