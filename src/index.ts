@@ -20,18 +20,32 @@ class BeerApp {
     private searUrlApi = 'https://api.punkapi.com/v2/beers';
     private input: HTMLInputElement = document.getElementById('site-search') as HTMLInputElement;
     private searchedContent: HTMLElement = document.getElementById('searched-content') as HTMLElement;
+    private imgBox: HTMLElement = document.getElementById('img-box') as HTMLElement;
+    private descriptionBox: HTMLElement = document.getElementById('description-box') as HTMLElement;
     private currentPage: number = 1;
     private beersPerPage: number = 10;
     private displayedBeers: Beer[] = [];
     private totalBeers: number = 0;
+    private totalPages: number = 0;
+    private lastSearchWord: string = '';
+    private currentPageSpan: HTMLElement = document.getElementById('current-page') as HTMLElement;
+    private searchButton: HTMLElement = document.getElementById('search-btn') as HTMLElement;
+    private nextPageButton: HTMLElement = document.getElementById('next-page') as HTMLElement;
+    private prevPageButton: HTMLElement = document.getElementById('prev-page') as HTMLElement;
+    private randomBeerButton: HTMLElement = document.getElementById('random-beer-btn') as HTMLElement;
+    private beerImage: HTMLImageElement = document.getElementById('image') as HTMLImageElement;
+    private infoBtn: HTMLElement = document.getElementById('info-btn') as HTMLElement;
 
     constructor() {
         this.setupEventListeners();
     }
 
     private setupEventListeners() {
-        document.getElementById('search-btn')?.addEventListener('click', () => this.searchBeer());
-        document.getElementById('random-beer-btn')?.addEventListener('click', () => this.getRandomBeer());
+        this.searchButton.addEventListener('click', () => this.searchBeer());
+        this.randomBeerButton.addEventListener('click', () => this.getRandomBeer());
+        this.nextPageButton.addEventListener("click", () => this.nextPage());
+        this.prevPageButton.addEventListener("click", () => this.prevPage());
+        this.infoBtn.addEventListener('click', async () => this.showAdditionalInfo());
     }
 
     private async getRandomBeer() {
@@ -96,7 +110,73 @@ class BeerApp {
             this.searchedContent.innerHTML = "<p>No results found for the given search term.</p>";
         }
         
-            
+        private displayNoImage() {
+            this.imgBox.textContent = ""; 
+            const noImagePlaceholder = document.createElement('img');
+            noImagePlaceholder.src = 'https://as2.ftcdn.net/v2/jpg/00/89/55/15/1000_F_89551596_LdHAZRwz3i4EM4J0NHNHy2hEUYDfXc0j.jpg'; // Provide the path to your default image
+            noImagePlaceholder.alt = 'No Image';
+            this.imgBox.appendChild(noImagePlaceholder);
+        }    
 
-                
+        private displayBeer(beer: Beer) { 
+            this.searchedContent.textContent = "";
+            const beerElement = document.createElement('p'); 
+            beerElement.classList.add('one-beer');
+            beerElement.textContent = beer.name;  
+            beerElement.addEventListener('click', () => {
+                this.displayBeerDetails(beer);
+                beerElement.style.backgroundColor = "yellow";
+                document.querySelector(".one-beer")?.classList.add("showPil");
+                this.descriptionBox.textContent = "";
+            });
+            this.searchedContent.appendChild(beerElement);
+        }
+        
+        private displayBeerList() {
+            this.searchedContent.textContent = "";
+          
+            const beerList = document.createElement('ul');
+            beerList.classList.add('beer-list');
+          
+            this.displayedBeers.forEach(beer => {   // beers change to displayedBeers
+              const beerItem = document.createElement('li');
+              beerItem.textContent = beer.name;
+              beerItem.addEventListener('click', () =>  {
+                this.descriptionBox.textContent= "";
+                clearSelectedLi();
+                markSelectedLi(beerItem);
+                displayBeerDetails(beer);
+              });
+              beerList.appendChild(beerItem);
+          
+            });
+            this.searchedContent.appendChild(beerList);
+          };
+        
+        private updatePageDisplay() {
+            this.totalPages = Math.ceil(this.totalBeers / this.beersPerPage);
+            this.currentPageSpan.textContent = `${this.currentPage} / ${this.totalPages}`;
+        };
+
+        private async nextPage() {
+            if (this.currentPage < this.totalPages) {
+                this.currentPage++;
+                await this.searchBeer();
+                this.updatePageDisplay();
+            }
+        }
+    
+        private async prevPage() {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+                await this.searchBeer();
+                this.updatePageDisplay();
+            }
+        }
+
+        
+
+
 }
+        
+        

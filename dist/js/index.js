@@ -13,16 +13,29 @@ class BeerApp {
         this.searUrlApi = 'https://api.punkapi.com/v2/beers';
         this.input = document.getElementById('site-search');
         this.searchedContent = document.getElementById('searched-content');
+        this.imgBox = document.getElementById('img-box');
+        this.descriptionBox = document.getElementById('description-box');
         this.currentPage = 1;
         this.beersPerPage = 10;
         this.displayedBeers = [];
         this.totalBeers = 0;
+        this.totalPages = 0;
+        this.lastSearchWord = '';
+        this.currentPageSpan = document.getElementById('current-page');
+        this.searchButton = document.getElementById('search-btn');
+        this.nextPageButton = document.getElementById('next-page');
+        this.prevPageButton = document.getElementById('prev-page');
+        this.randomBeerButton = document.getElementById('random-beer-btn');
+        this.beerImage = document.getElementById('image');
+        this.infoBtn = document.getElementById('info-btn');
         this.setupEventListeners();
     }
     setupEventListeners() {
-        var _a, _b;
-        (_a = document.getElementById('search-btn')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => this.searchBeer());
-        (_b = document.getElementById('random-beer-btn')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', () => this.getRandomBeer());
+        this.searchButton.addEventListener('click', () => this.searchBeer());
+        this.randomBeerButton.addEventListener('click', () => this.getRandomBeer());
+        this.nextPageButton.addEventListener("click", () => this.nextPage());
+        this.prevPageButton.addEventListener("click", () => this.prevPage());
+        this.infoBtn.addEventListener('click', () => __awaiter(this, void 0, void 0, function* () { return this.showAdditionalInfo(); }));
     }
     getRandomBeer() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -86,5 +99,67 @@ class BeerApp {
     }
     displayNoResults() {
         this.searchedContent.innerHTML = "<p>No results found for the given search term.</p>";
+    }
+    displayNoImage() {
+        this.imgBox.textContent = "";
+        const noImagePlaceholder = document.createElement('img');
+        noImagePlaceholder.src = 'https://as2.ftcdn.net/v2/jpg/00/89/55/15/1000_F_89551596_LdHAZRwz3i4EM4J0NHNHy2hEUYDfXc0j.jpg';
+        noImagePlaceholder.alt = 'No Image';
+        this.imgBox.appendChild(noImagePlaceholder);
+    }
+    displayBeer(beer) {
+        this.searchedContent.textContent = "";
+        const beerElement = document.createElement('p');
+        beerElement.classList.add('one-beer');
+        beerElement.textContent = beer.name;
+        beerElement.addEventListener('click', () => {
+            var _a;
+            this.displayBeerDetails(beer);
+            beerElement.style.backgroundColor = "yellow";
+            (_a = document.querySelector(".one-beer")) === null || _a === void 0 ? void 0 : _a.classList.add("showPil");
+            this.descriptionBox.textContent = "";
+        });
+        this.searchedContent.appendChild(beerElement);
+    }
+    displayBeerList() {
+        this.searchedContent.textContent = "";
+        const beerList = document.createElement('ul');
+        beerList.classList.add('beer-list');
+        this.displayedBeers.forEach(beer => {
+            const beerItem = document.createElement('li');
+            beerItem.textContent = beer.name;
+            beerItem.addEventListener('click', () => {
+                this.descriptionBox.textContent = "";
+                clearSelectedLi();
+                markSelectedLi(beerItem);
+                displayBeerDetails(beer);
+            });
+            beerList.appendChild(beerItem);
+        });
+        this.searchedContent.appendChild(beerList);
+    }
+    ;
+    updatePageDisplay() {
+        this.totalPages = Math.ceil(this.totalBeers / this.beersPerPage);
+        this.currentPageSpan.textContent = `${this.currentPage} / ${this.totalPages}`;
+    }
+    ;
+    nextPage() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.currentPage < this.totalPages) {
+                this.currentPage++;
+                yield this.searchBeer();
+                this.updatePageDisplay();
+            }
+        });
+    }
+    prevPage() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+                yield this.searchBeer();
+                this.updatePageDisplay();
+            }
+        });
     }
 }
