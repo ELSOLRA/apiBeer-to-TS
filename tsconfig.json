@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+    "skipLibCheck": true,
+    "module": "ES2015",
+      "strict": true,
+      "target": "ES6",
+      "lib": ["ES2016", "DOM"],   //  downlevel the code to ES6 while still using ES2016 or later features
+      "outDir": "./dist/js",
+      "removeComments": true
+  
+    },
+    "include": ["./src"]
+  }
