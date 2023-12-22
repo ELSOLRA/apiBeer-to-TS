@@ -35,7 +35,7 @@ export class BeerApp {
             this.nextPageButton,
             this.prevPageButton,
             this.infoBtn,
-            this
+            this    // By passing "this" to the setupEventListeners function, it's like effectively passing the current instance of the BeerApp class 
         );
     }
     public async getRandomBeer() {
